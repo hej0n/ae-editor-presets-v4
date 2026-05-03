@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AE editor presets</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --card: rgba(255,255,255,0.075);
+    --card-border: rgba(255,255,255,0.12);
+    --text: #ffffff;
+    --muted: #9a9a9a;
+    --green: #4caf50;
+    --shadow: 0 24px 60px rgba(0,0,0,0.55);
+  }
+  * { box-sizing: border-box; }
+  html { scrollbar-gutter: stable both-edges; background: var(--bg); }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--text); background:var(--bg); overflow-x:hidden; min-height:100vh; }
+
+  .bg { position:fixed; inset:0; z-index:-3;
+    background:
+      radial-gradient(circle at 14% 18%, rgba(95, 108, 255, .24), transparent 22%),
+      radial-gradient(circle at 82% 16%, rgba(0, 210, 255, .18), transparent 20%),
+      radial-gradient(circle at 84% 82%, rgba(255, 90, 214, .14), transparent 24%),
+      radial-gradient(circle at 35% 78%, rgba(124, 255, 213, .10), transparent 20%),
+      linear-gradient(120deg, #050608 0%, #0a0c12 28%, #101827 52%, #0b1016 76%, #050608 100%);
+    background-size: 140% 140%, 140% 140%, 150% 150%, 140% 140%, 320% 320%;
+    animation: gradientMove 18s ease-in-out infinite, gradientPan 30s linear infinite; }
+  .bg::before { content:""; position:absolute; inset:-24%;
+    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.10),transparent 18%),
+               radial-gradient(circle at 70% 60%,rgba(255,255,255,.07),transparent 20%),
+               radial-gradient(circle at 50% 50%,rgba(82,122,255,.12),transparent 32%);
+    filter:blur(95px) saturate(140%); opacity:.82; animation:drift 16s ease-in-out infinite; pointer-events:none; mix-blend-mode:screen; }
+  .bg::after { content:""; position:absolute; inset:-18%;
+    background:linear-gradient(125deg, transparent 0%, rgba(255,255,255,.08) 38%, transparent 62%),
+               radial-gradient(circle at 18% 72%, rgba(72, 255, 226, .12), transparent 22%),
+               radial-gradient(circle at 82% 24%, rgba(153, 112, 255, .15), transparent 24%);
+    filter:blur(70px); opacity:.62; animation:floatGlow 22s ease-in-out infinite; pointer-events:none; mix-blend-mode:screen; }
+
+  @keyframes gradientMove { 0%{background-position:0% 50%, 100% 0%, 0% 100%, 100% 100%, 0% 50%} 50%{background-position:100% 50%, 0% 100%, 100% 0%, 0% 0%, 100% 50%} 100%{background-position:0% 50%, 100% 0%, 0% 100%, 100% 100%, 0% 50%} }
+  @keyframes gradientPan { 0%{filter:hue-rotate(0deg) saturate(110%)} 50%{filter:hue-rotate(10deg) saturate(125%)} 100%{filter:hue-rotate(0deg) saturate(110%)} }
+  @keyframes drift { 0%,100%{transform:translate3d(0,0,0) scale(1)} 50%{transform:translate3d(30px,-18px,0) scale(1.05)} }
+  @keyframes floatGlow { 0%,100%{transform:translate3d(-10px,8px,0) scale(1)} 50%{transform:translate3d(18px,-12px,0) scale(1.08)} }
+
+  .progress { position:fixed; top:0; left:0; width:0%; height:3px; z-index:999;
+    background:linear-gradient(90deg,rgba(255,255,255,.95),rgba(255,255,255,.35));
+    box-shadow:0 0 20px rgba(255,255,255,.18); transition:width .1s linear; }
+
+  .wrap { width:min(1440px,calc(100% - 40px)); margin:0 auto; }
+
+  header { padding:92px 0 28px; text-align:center; }
+
+  .eyebrow { display:inline-flex; align-items:center; gap:10px; padding:8px 14px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.09); background:rgba(255,255,255,.04); color:var(--muted);
+    backdrop-filter:blur(18px); font-size:13px; letter-spacing:.01em; }
+  .eyebrow-dot { width:8px; height:8px; border-radius:999px; background:linear-gradient(180deg,#fff,#9c9c9c); box-shadow:0 0 16px rgba(255,255,255,.35); }
+
+  h1 { margin:18px 0 0; font-size:clamp(42px,6vw,64px); line-height:.98; letter-spacing:-.04em;
+    background:linear-gradient(90deg,#fff,#d7d7d7 55%,#8f8f8f); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .subtitle { margin-top:16px; font-size:18px; color:#c7c7c7; }
+  .hero-desc { width:min(720px,100%); margin:18px auto 0; color:var(--muted); line-height:1.7; font-size:16px; }
+
+  .meta-row { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:24px; }
+  .chip { padding:10px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:#f0f0f0; font-size:13px; backdrop-filter:blur(18px); }
+  .meta-row .chip strong { color:#fff; }
+
+  .search-panel { margin:30px auto 18px; padding:18px; border-radius:24px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); box-shadow:var(--shadow); backdrop-filter:blur(24px); }
+  .search-label { font-size:14px; color:var(--muted); margin-bottom:10px; }
+  .search-row { display:flex; gap:10px; align-items:center; }
+  .search-row input { flex:1; appearance:none; border:1px solid rgba(255,255,255,.12); outline:none; background:rgba(0,0,0,.35); color:#fff; border-radius:999px; padding:14px 18px; font-size:15px; transition:border-color .2s ease,box-shadow .2s ease; }
+  .search-row input:focus { border-color:rgba(255,255,255,.28); box-shadow:0 0 0 4px rgba(255,255,255,.04); }
+  .search-clear { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:#fff; border-radius:999px; padding:14px 16px; cursor:pointer; transition:transform .2s ease,background .2s ease; white-space:nowrap; }
+  .search-clear:hover { transform:translateY(-1px); background:rgba(255,255,255,.1); }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline:2px solid rgba(255,255,255,.7); outline-offset:3px; }
+
+
+  .section { padding:36px 0 14px; }
+  .section h2 { font-size:24px; letter-spacing:-.02em; margin:0 0 14px; }
+  .section-note { color:var(--muted); margin:0 0 20px; line-height:1.65; }
+  .count { color:#fff; font-weight:600; }
+  .result-line { margin-top:12px; color:var(--muted); font-size:13px; }
+
+  .search-results-panel { margin:18px auto 18px; padding:22px; border-radius:28px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.055); box-shadow:var(--shadow); backdrop-filter:blur(24px); position:relative; overflow:hidden; }
+  .search-results-panel::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.08),transparent 28%); pointer-events:none; }
+  .search-results-panel .section-head { margin-bottom:14px; }
+  .search-results-panel .section-head p { max-width:760px; }
+
+  .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; align-items:stretch; }
+
+  /* CARD */
+  .card { position:relative; overflow:hidden; padding:20px; border-radius:26px; border:1px solid var(--card-border); background:var(--card); backdrop-filter:blur(30px); box-shadow:0 14px 40px rgba(0,0,0,.34); transform:translateY(0) scale(1); transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),border-color .35s ease,opacity .35s ease; display:flex; flex-direction:column; gap:12px; min-height:100%; }
+  .card:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 22px 52px rgba(0,0,0,.58); border-color:rgba(255,255,255,.18); }
+  .card::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at var(--mx,50%) var(--my,20%),rgba(255,255,255,.15),transparent 55%); opacity:0; transition:opacity .25s ease; pointer-events:none; }
+  .card:hover::before { opacity:1; }
+  .card::after { content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.12),transparent); transform:translateX(-100%); transition:transform .65s ease; pointer-events:none; mix-blend-mode:screen; }
+  .card:hover::after { transform:translateX(100%); }
+
+  /* Pack banner */
+  .pack-banner { width:100%; aspect-ratio:1 / 1; height:auto; object-fit:contain; object-position:center; padding:10px; border-radius:18px; margin-bottom:2px; display:block; background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.26)); border:1px solid rgba(255,255,255,.08); box-sizing:border-box; }
+
+  .title { font-size:20px; line-height:1.25; letter-spacing:-.02em; margin:0; padding-right:0; flex:1; }
+
+  .free { display:inline-flex; align-items:center; gap:7px; margin-top:12px; margin-bottom:10px; padding:8px 12px; border-radius:999px; background:rgba(76,175,80,.12); border:1px solid rgba(76,175,80,.22); color:#9ef0a3; font-size:13px; }
+  .free::before { content:""; width:7px; height:7px; border-radius:999px; background:var(--green); box-shadow:0 0 12px rgba(76,175,80,.45); }
+  .pack-size { display:inline-flex; align-items:center; gap:7px; margin-top:-2px; margin-bottom:10px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#f1f1f1; font-size:13px; width:max-content; }
+
+  .dl-counter { display:inline-flex; align-items:center; gap:6px; margin-bottom:16px; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:var(--muted); font-size:12px; }
+  .dl-counter-icon { opacity:.65; font-size:11px; }
+  .dl-counter-num { font-weight:700; color:#e8e8e8; font-variant-numeric:tabular-nums; min-width:10px; }
+  .dl-counter.bumping .dl-counter-num { animation:numPop .42s cubic-bezier(.2,.8,.2,1); }
+  @keyframes numPop { 0%{transform:scale(1)} 40%{transform:scale(1.4);color:#fff} 100%{transform:scale(1)} }
+
+  /* Card action row */
+  .card-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border-radius:999px; background:linear-gradient(180deg,#fff,#dcdcdc); color:#000; text-decoration:none; font-weight:600; font-size:14px; transition:transform .25s ease,filter .25s ease,box-shadow .25s ease; box-shadow:0 10px 24px rgba(255,255,255,.06); border:none; cursor:pointer; white-space:nowrap; }
+  .btn:hover { transform:scale(1.06); filter:brightness(1.04); }
+
+  .about-btn { display:inline-flex; align-items:center; gap:7px; padding:12px 16px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.07); color:#e0e0e0; font-size:13px; font-weight:500; cursor:pointer; transition:transform .22s ease,background .22s ease,border-color .22s ease; white-space:nowrap; }
+  .about-btn:hover { transform:translateY(-1px); background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.24); }
+
+  /* Like button */
+  .like-btn { display:inline-flex; align-items:center; gap:6px; padding:12px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:#bbb; font-size:13px; font-weight:600; cursor:pointer; transition:transform .22s ease,background .22s ease,border-color .22s ease,color .22s ease,box-shadow .22s ease; user-select:none; white-space:nowrap; }
+  .like-btn:hover { transform:translateY(-1px); background:rgba(255,77,109,.12); border-color:rgba(255,77,109,.25); color:#ff7090; }
+  .like-btn.liked { color:#ff4d6d; background:rgba(255,77,109,.14); border-color:rgba(255,77,109,.3); box-shadow:0 0 0 4px rgba(255,77,109,.06); }
+  .like-btn .like-icon { font-size:15px; transition:transform .25s ease; line-height:1; }
+  .like-btn:hover .like-icon { transform:scale(1.2); }
+  .like-btn.liked .like-icon { animation:heartPop .4s cubic-bezier(.2,.8,.2,1); }
+  .like-btn.like-bump .like-count { animation:numPop .35s ease; }
+  @keyframes heartPop { 0%{transform:scale(.7)} 50%{transform:scale(1.35)} 100%{transform:scale(1)} }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.72); backdrop-filter:blur(16px); align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; animation:modalFadeIn .28s ease forwards; }
+  @keyframes modalFadeIn { from{opacity:0} to{opacity:1} }
+
+  .modal { position:relative; width:min(560px,100%); max-height:85vh; overflow-y:auto; border-radius:28px; border:1px solid rgba(255,255,255,.14); background:rgba(16,16,16,.98); box-shadow:0 40px 100px rgba(0,0,0,.8); padding:32px; animation:modalSlideIn .35s cubic-bezier(.2,.8,.2,1) forwards; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.15) transparent; }
+  @keyframes modalSlideIn { from{transform:translateY(24px) scale(.97);opacity:0} to{transform:translateY(0) scale(1);opacity:1} }
+
+  .modal-close { position:absolute; top:18px; right:18px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07); color:#ccc; font-size:18px; cursor:pointer; transition:background .2s ease,transform .2s ease; line-height:1; }
+  .modal-close:hover { background:rgba(255,255,255,.13); transform:rotate(90deg); }
+
+  .modal-banner { width:100%; aspect-ratio:1 / 1; height:auto; object-fit:contain; object-position:center; border-radius:18px; margin-bottom:22px; display:block; background:rgba(0,0,0,.32); border:1px solid rgba(255,255,255,.08); box-sizing:border-box; padding:10px; }
+  .modal-title { font-size:22px; font-weight:700; letter-spacing:-.02em; margin:0 0 10px; padding-right:40px; }
+
+  .modal-ae-req { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; background:rgba(72,90,255,.12); border:1px solid rgba(72,90,255,.22); color:#a0aaff; font-size:12px; margin-bottom:10px; }
+  .modal-size { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#f1f1f1; font-size:12px; margin-bottom:18px; width:max-content; }
+
+  .modal-section-label { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:18px 0 10px; }
+  .modal-tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .modal-tag { padding:7px 12px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); color:#e0e0e0; font-size:13px; }
+  .modal-desc { color:#bbb; line-height:1.7; font-size:14px; margin:0; }
+  .modal-dl-btn { margin-top:22px; width:100%; padding:14px; font-size:15px; }
+
+  /* Sections */
+  .info-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:18px; }
+  .info-card { padding:18px; border-radius:18px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); backdrop-filter:blur(22px); }
+  .info-card h3 { margin:0 0 8px; font-size:16px; }
+  .info-card p { margin:0; color:var(--muted); line-height:1.6; font-size:14px; }
+
+  .glass { padding:28px; border-radius:24px; border:1px solid rgba(255,255,255,.09); background:rgba(255,255,255,.04); backdrop-filter:blur(24px); margin-bottom:18px; }
+  .install-list { margin:0; padding-left:18px; color:#ededed; line-height:1.75; }
+  .install-list li { margin-bottom:8px; }
+  .install-note { margin-top:16px; color:var(--muted); line-height:1.65; }
+
+  .footer { padding:54px 0 42px; text-align:center; color:#5f5f5f; font-size:13px; }
+
+  .fade { opacity:0; transform:translateY(36px); transition:opacity .8s ease,transform .8s ease; }
+  .fade.show { opacity:1; transform:translateY(0); }
+
+  .empty-state { display:none; padding:28px; border-radius:20px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:var(--muted); text-align:center; }
+
+  /* Favorites */
+  .favorites-panel { margin:26px auto 18px; padding:22px; border-radius:28px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.055); box-shadow:var(--shadow); backdrop-filter:blur(24px); position:relative; overflow:hidden; }
+  .favorites-panel::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.08),transparent 28%); pointer-events:none; }
+  .section-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:12px; }
+  .section-head h2 { margin-bottom:0; }
+  .section-head p { margin:0; color:var(--muted); font-size:14px; }
+  .favorites-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:14px; }
+  .favorite-card { padding:16px; border-radius:22px; border:1px solid rgba(255,255,255,.09); background:rgba(0,0,0,.22); animation:popIn .35s ease; }
+  .favorite-card .title { font-size:17px; padding-right:0; }
+  .favorite-card .free { margin-top:10px; margin-bottom:8px; }
+  .favorite-card .dl-counter { margin-bottom:12px; }
+  .favorite-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .remove-fav { appearance:none; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:#fff; border-radius:999px; padding:12px 14px; cursor:pointer; transition:transform .22s ease,background .22s ease; font-size:14px; }
+  .remove-fav:hover { transform:translateY(-1px); background:rgba(255,255,255,.1); }
+
+  .fav-btn { position:absolute; top:18px; right:18px; width:42px; height:42px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07); color:#d8d8d8; cursor:pointer; font-size:20px; line-height:1; transition:transform .2s ease,background .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease; z-index:2; }
+  .fav-btn:hover { transform:scale(1.08); background:rgba(255,255,255,.12); }
+  .fav-btn.is-favorite { color:#ffd54a; background:rgba(255,213,74,.14); border-color:rgba(255,213,74,.28); box-shadow:0 0 0 6px rgba(255,213,74,.06); }
+  .fav-btn.is-favorite span { display:inline-block; animation:starPop .42s ease; }
+  .card.is-favorite { border-color:rgba(255,213,74,.24); box-shadow:0 18px 45px rgba(0,0,0,.38),0 0 0 1px rgba(255,213,74,.06); }
+  .card.fav-pulse { animation:favPulse .5s ease; }
+
+  .empty-favorites { display:none; margin-top:14px; padding:22px; border-radius:18px; border:1px dashed rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:var(--muted); text-align:center; line-height:1.6; }
+
+  .recommendations-panel { margin:26px auto 18px; padding:22px; border-radius:28px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.055); box-shadow:var(--shadow); backdrop-filter:blur(24px); position:relative; overflow:hidden; }
+  .recommendations-panel::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.08),transparent 28%); pointer-events:none; }
+  .recommendations-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:14px; }
+  .recommendation-card { padding:16px; border-radius:22px; border:1px solid rgba(255,255,255,.09); background:rgba(0,0,0,.22); animation:popIn .35s ease; display:flex; flex-direction:column; gap:12px; min-height:100%; }
+  .recommendation-thumb { width:100%; aspect-ratio:1 / 1; object-fit:contain; object-position:center; border-radius:18px; display:block; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.32); box-sizing:border-box; padding:10px; }
+  .recommendation-card .title { font-size:17px; padding-right:0; }
+  .recommendation-size { display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); color:#e4e4e4; font-size:12px; width:max-content; }
+  .recommendation-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:auto; }
+  .card-stats { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .card-stats .dl-counter { margin-bottom:0; }
+  .card-stats .like-btn { padding:10px 12px; min-height:42px; }
+  .card-stats .like-count { min-width:18px; }
+  .recommendation-actions .btn, .recommendation-actions .about-btn { padding:10px 14px; font-size:13px; }
+  .recommendation-actions .fav-btn { position:static; width:auto; height:auto; min-width:42px; min-height:42px; padding:10px 12px; }
+
+  @keyframes starPop { 0%{transform:scale(.7) rotate(-20deg)} 45%{transform:scale(1.25) rotate(12deg)} 100%{transform:scale(1) rotate(0deg)} }
+  @keyframes favPulse { 0%{transform:translateY(0) scale(1)} 35%{transform:translateY(-4px) scale(1.02)} 100%{transform:translateY(0) scale(1)} }
+  @keyframes popIn { 0%{opacity:0;transform:translateY(14px) scale(.98)} 100%{opacity:1;transform:translateY(0) scale(1)} }
+
+  @media (max-width:1280px) {
+    .grid, .recommendations-grid, .favorites-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  }
+
+  @media (max-width:860px) {
+    .info-grid,.favorites-grid { grid-template-columns:1fr; }
+    header { padding-top:76px; }
+    .search-row { flex-direction:column; align-items:stretch; }
+    .search-clear { width:100%; }
+    .section-head { flex-direction:column; align-items:flex-start; }
+    .card-actions { gap:6px; }
+    .about-btn,.like-btn { padding:10px 12px; font-size:12px; }
+  }
+
+  @media (max-width:760px) {
+    .grid, .recommendations-grid, .favorites-grid { grid-template-columns:1fr; }
+  }
+
+  /* Updated card layout with real pack photos */
+  .card { display:flex; flex-direction:column; gap:14px; }
+  .pack-banner { width:100%; aspect-ratio:1 / 1; height:auto; object-fit:contain; object-position:center; border-radius:18px; margin-bottom:0; display:block; background:rgba(0,0,0,.30); border:1px solid rgba(255,255,255,.08); box-sizing:border-box; padding:10px; }
+  .card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .fav-btn { position:static; width:auto; height:auto; min-width:42px; min-height:42px; padding:10px 12px; align-self:flex-start; }
+  .card-actions { margin-top:auto; }
+  .favorite-card { display:flex; flex-direction:column; gap:12px; }
+  .favorite-thumb { width:100%; aspect-ratio:1 / 1; object-fit:contain; object-position:center; border-radius:18px; display:block; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.32); box-sizing:border-box; padding:10px; }
+  .favorite-card .title { font-size:20px; }
+  .favorite-card .fav-btn { display:none; }
+
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="progress" id="progress"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" id="modalClose" aria-label="Закрыть">✕</button>
+    <img class="modal-banner" id="modalBanner" src="" alt="" />
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-ae-req" id="modalAeReq"></div>
+    <div class="modal-size" id="modalSize"></div>
+    <div class="modal-section-label">Что включено</div>
+    <div class="modal-tags" id="modalTags"></div>
+    <div class="modal-section-label" id="modalDescLabel">Описание</div>
+    <p class="modal-desc" id="modalDesc"></p>
+    <a class="btn modal-dl-btn" id="modalDlBtn" href="#" target="_blank" rel="noopener">Скачать пак</a>
+  </div>
+</div>
+
+<header class="wrap fade">
+  <div class="eyebrow"><span class="eyebrow-dot"></span> AE editor presets • 2026</div>
+  <h1>AE editor presets</h1>
+  <div class="subtitle">Паки пресетов для After Effects</div>
+  <p class="hero-desc">AE editor presets — это аккуратная библиотека бесплатных паков для монтажа в After Effects. Здесь собраны лучшие пресеты популярных эдиторов, чтобы скачивать их в один клик, быстро находить нужный пак и сразу добавлять его в свой workflow.</p>
+  <div class="meta-row">
+    <div class="chip"><span id="totalPacksChip">10</span> паков</div>
+    <div class="chip">Избранное: <strong id="favCount">0</strong></div>
+    <div class="chip">Все бесплатно</div>
+    <div class="chip">Безопасные файлы</div>
+    <div class="chip">Только Windows</div>
+    <div class="chip">by hejon © 2026</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="search-panel fade">
+    <div class="search-label">Поиск по названию или ключевым словам</div>
+    <div class="search-row">
+      <input id="searchInput" type="text" placeholder="Например: trxzy, text, bundle, joshh..." autocomplete="off" />
+      <button class="search-clear" id="clearBtn" type="button">Очистить</button>
+    </div>
+    <div class="result-line"><span id="searchHint">Всего паков: <span class="count">10</span></span></div>
+  </section>
+
+  <section class="section fade search-results-panel" id="searchResultsSection" style="display:none;">
+    <div class="section-head">
+      <div>
+        <h2>Результаты поиска</h2>
+        <p>Найденные паки появляются здесь, сразу под строкой поиска. Внизу страницы список «Доступные паки» остаётся полным.</p>
+      </div>
+      <div class="chip">Найдено: <strong id="resultCount">0</strong></div>
+    </div>
+    <div class="grid" id="searchResultsGrid"></div>
+    <div class="empty-state" id="emptySearchResults" style="display:none">Ничего не найдено. Попробуй другое слово, например: <b>text</b>, <b>pack</b>, <b>bundle</b>, <b>joshh</b>.</div>
+  </section>
+
+  <section class="section fade recommendations-panel" id="recommendationsSection">
+    <div class="section-head">
+      <div>
+        <h2>Рекомендуем</h2>
+        <p>Лента собирается автоматически: лайки важнее, а скачивания помогают поднять карточку выше.</p>
+      </div>
+      <div class="chip">Живая сортировка</div>
+    </div>
+    <div class="recommendations-grid" id="recommendationsGrid"></div>
+    <div class="empty-state" id="emptyRecommendations" style="display:none">Пока нет данных для рекомендаций.</div>
+  </section>
+
+  <section class="section fade favorites-panel" id="favoritesSection">
+    <div class="section-head">
+      <div><h2>Избранное</h2><p>Паки, которые ты отметил звездочкой.</p></div>
+      <div class="chip">Сохранено в браузере</div>
+    </div>
+    <div class="favorites-grid" id="favoritesGrid"></div>
+    <div class="empty-favorites" id="emptyFavorites">Здесь пока пусто. Нажми на звездочку у любого пака, и он появится в этом разделе.</div>
+  </section>
+
+  <section class="section fade">
+    <h2>Доступные паки</h2>
+    <p class="section-note">Каждый пак отмечен как бесплатный. Нажми «О паке» для подробностей или «Скачать» для загрузки. ♥ — лайки видят все пользователи.</p>
+
+    <div class="grid" id="cards">
+
+      <article class="card fade"
+        data-name="trxzy editing pack best cc's,zooms,overlays,sound effects,topaz & handbrake settings,my project files,pannings,effects,twixtors,slide combo (normal & rotation),shakes,text pjf,upload method"
+        data-download="https://drive.google.com/uc?export=download&id=1bW738z-TQJfpR-1OrUhmgOhgR--puvs_"
+        data-key="trxzy-editing-pack"
+        data-image="assets/trxzy.jpg"
+        data-ae="After Effects 2024+"
+        data-items="Best CC's,Zooms,Overlays,Sound Effects,Topaz & Handbrake settings,My Project Files,Pannings,Effects,Twixtors,Slide Combo (Normal & Rotation),Shakes,Text PJF,Upload method"
+        data-desc="TRXZY's 10K Editing Pack — один из самых полных паков. Внутри есть пресеты, звуки, оверлеи, проектные файлы, твиксторы, шейки и отдельный upload method. Подходит для After Effects 2024 и новее.">
+        <img class="pack-banner" src="assets/trxzy.jpg" alt="TRXZY Editing Pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">TRXZY Editing Pack</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1bW738z-TQJfpR-1OrUhmgOhgR--puvs_" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="seb aep pack 40 presets total,zooms,slides,shake,effects,pannings,twixtor"
+        data-download="https://drive.google.com/uc?export=download&id=1h_AZ54Zkvtf6DKfwawn3jS_EHlgj92An"
+        data-key="seb-aep-pack"
+        data-image="assets/seb.jpg"
+        data-ae="After Effects 2020+"
+        data-items="40 presets total,Zooms,Slides,Shake,Effects,Pannings,Twixtor"
+        data-desc="SEB.AEP — компактный пак с 40 пресетами. Здесь есть зумы, слайды, шейки, эффекты, панинги и твикстор. Легкий стартовый набор для монтажа.">
+        <img class="pack-banner" src="assets/seb.jpg" alt="SEB_AEP pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">SEB_AEP PACK</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1h_AZ54Zkvtf6DKfwawn3jS_EHlgj92An" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="ezos editing bundle my color corrections,slides and slide,my text effects and text,zoom presets,quality guide,handbrake settings,topaz settings,gozalo pjf,some random presets i use"
+        data-download="https://drive.google.com/uc?export=download&id=1mcOVHHJ8Q2Ptmhi4bFZJjxM8pFdDvGa7"
+        data-key="ezo-editing-bundle"
+        data-image="assets/ezo.jpg"
+        data-ae="After Effects 2023+"
+        data-items="My Color Corrections,Slides And Slide,My Text Effects And Text,Zoom Presets,Quality Guide,Handbrake Settings,Topaz Settings,Gozalo Pjf,Some Random Presets i Use"
+        data-desc="Ezo's Editing Bundle — набор с авторскими цветокоррекциями, текстовыми эффектами, зум-пресетами и настройками качества. Включает Gozalo Pjf и дополнительные пресеты, которые автор использует сам.">
+        <img class="pack-banner" src="assets/ezo.jpg" alt="Ezo's Editing Bundle" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Ezo's Editing Bundle</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1mcOVHHJ8Q2Ptmhi4bFZJjxM8pFdDvGa7" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="envyy s editing pack 8 cc's,5 project files,zooms,slides,20 overlays,12 audios,52 effects"
+        data-download="https://drive.google.com/uc?export=download&id=1D9nuW5hLUlg0Bhx3vAyfJyodlW9osS4G"
+        data-key="envyy-editing-pack"
+        data-image="assets/envyy.jpg"
+        data-ae="After Effects 2024+"
+        data-items="8 cc's,5 Project files,Zooms,Slides,20 overlays,12 audios,52 effects"
+        data-desc="Envyy 40K Editing Pack — большой пак с 8 cc's, 5 project files, зумами, слайдами, оверлеями, аудио и 52 эффектами. Один из самых насыщенных наборов в коллекции.">
+        <img class="pack-banner" src="assets/envyy.jpg" alt="Envyy Editing Pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Envyy_s Editing Pack</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1D9nuW5hLUlg0Bhx3vAyfJyodlW9osS4G" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="legans new editing bundle cc's,topaz & handbrake settings,upload method,quality tutorial & viral method,zooms,twixtors,a lot of other effects,private telegram channel"
+        data-download="https://drive.google.com/uc?export=download&id=1OZtKUmgPoUwgaWN0G4Ibr_tg-5gYKojA"
+        data-key="legan-editing-bundle"
+        data-image="assets/legan.jpg"
+        data-ae="After Effects 2020+"
+        data-items="CC's,Topaz & Handbrake settings,Upload method,Quality tutorial & Viral method,Zooms,Twixtors,A lot of other effects,Private Telegram channel"
+        data-desc="Legan's New Editing Bundle — пак с CC's, настройками Topaz и Handbrake, upload method, viral tutorial, зумами, твиксторами и большим количеством дополнительных эффектов. Есть доступ к приватному Telegram-каналу.">
+        <img class="pack-banner" src="assets/legan.jpg" alt="Legan's New Editing Bundle" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Legan's New Editing Bundle</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1OZtKUmgPoUwgaWN0G4Ibr_tg-5gYKojA" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="drxpzs new editing presets 8 zooms,5 twixtor settings,5 color corrections,4 slides,3 shakes,4 text textures,2 audio settings,render settings,topaz settings"
+        data-download="https://drive.google.com/uc?export=download&id=1LHbcrf1dGvHVxCnHuokIbNICDVRNvh8L"
+        data-key="drxpz-editing-presets"
+        data-image="assets/drxpz.jpg"
+        data-ae="After Effects 2020+"
+        data-items="8 zooms,5 Twixtor Settings,5 Color Corrections,4 Slides,3 Shakes,4 Text Textures,2 Audio Settings,Render Settings,Topaz Settings"
+        data-desc="Drxpz AEP Editing Pack — 40+ пресетов: зумы, твикстор настройки, цветокоррекции, слайды, шейки, текстовые текстуры, аудио, render settings и Topaz settings.">
+        <img class="pack-banner" src="assets/drxpz.jpg" alt="Drxpz editing pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Drxpz's New Editing Presets</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1LHbcrf1dGvHVxCnHuokIbNICDVRNvh8L" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="final cut editing pack 4 cc's,5 project files,zooms,slides,32 overlays,53 effects"
+        data-download="https://drive.google.com/uc?export=download&id=1S2Gf0DcQlWutIkSXoO8B9HyLWfKzXI-H"
+        data-key="final-cut-editing-pack"
+        data-image="assets/final-cut.jpg"
+        data-ae="After Effects 2025+"
+        data-items="4 cc's,5 Project files,Zooms,Slides,32 overlays,53 effects"
+        data-desc="Final Cut Editing Pack — коллаборация Envyy × Joshh × Flaskery × D-Man. Большой пак с 4 cc's, 5 project files, зумами, слайдами, 32 overlay и 53 эффектами. Нужен After Effects 2025 или новее.">
+        <img class="pack-banner" src="assets/final-cut.jpg" alt="Final Cut editing pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Final Cut Editing Pack</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1S2Gf0DcQlWutIkSXoO8B9HyLWfKzXI-H" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="text animations 23 effects and animations,text fade in & out,text glow & shadow,bend up & down,flux,light sweep,rays,smear"
+        data-download="https://drive.google.com/uc?export=download&id=1yqb9QnRzYRSiV3Adwxok2xQkge5_VUHN"
+        data-key="text-animations-pack"
+        data-image="assets/text-animations.jpg"
+        data-ae="After Effects 2024+"
+        data-items="23 effects and animations,Text Fade In & Out,Text Glow & Shadow,Bend Up & Down,Flux,Light Sweep,Rays,Smear"
+        data-desc="Text Animations by Kirbytop — 23 эффекта и анимации для текста: fade in/out, glow, shadow, bend up/down, flux, light sweep, rays, smear и другие.">
+        <img class="pack-banner" src="assets/text-animations.jpg" alt="Text Animations" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Text Animations</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1yqb9QnRzYRSiV3Adwxok2xQkge5_VUHN" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="ctoan ultimate editing pack 370+ presets,24kjhon rmk,overlay textures,updated pack,ae 2023+"
+        data-download="https://drive.google.com/uc?export=download&id=1zBEmALms0rPJ-F0G177swY5BeZ5jDL5t"
+        data-key="ctoan-ultimate-pack"
+        data-image="assets/ctoan.jpg"
+        data-ae="After Effects 2023+"
+        data-items="370+ presets,24kjhon RMK,Overlay textures,Updated pack,AE 2023+"
+        data-desc="Ctoan Ultimate Editing Pack — один из самых больших паков в коллекции: 370+ пресетов, 24kjhon RMK и overlay textures. Работает на AE 2023 и выше, регулярно обновляется.">
+        <img class="pack-banner" src="assets/ctoan.jpg" alt="Ctoan Ultimate Editing Pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Ctoan Ultimate Editing Pack</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1zBEmALms0rPJ-F0G177swY5BeZ5jDL5t" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+      <article class="card fade"
+        data-name="joshhs editing pack v3 cc x2,zooms x26,twixtor x4,text + text effects x15,pjf's,effects x30+,shakes,slides,quality settings,rotation"
+        data-download="https://drive.google.com/uc?export=download&id=1aYF3izdBMyRBjTqar8jeFcuvvwuIWjTg"
+        data-key="joshh-editing-pack-v3"
+        data-image="assets/joshh.jpg"
+        data-ae="After Effects 2020+"
+        data-items="CC x2,Zooms x26,Twixtor x4,Text + Text Effects x15,PJF's,Effects x30+,Shakes,Slides,Quality Settings,Rotation"
+        data-desc="Joshh's Editing Pack V3 — набор с 26 зумами, 4 твиксторами, 15 текстовыми эффектами, PJF файлами, шейками, слайдами, quality settings и rotation.">
+        <img class="pack-banner" src="assets/joshh.jpg" alt="Joshh editing pack" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">Joshh's Editing Pack V3</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        <div class="free">Бесплатный пак</div>
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">0</span>&nbsp;скачиваний</div>
+        <div class="card-actions">
+          <a class="btn dl-btn" href="https://drive.google.com/uc?export=download&id=1aYF3izdBMyRBjTqar8jeFcuvvwuIWjTg" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+          <button class="like-btn" type="button"><span class="like-icon">♥</span><span class="like-count">0</span></button>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="empty-state" id="emptyState">Ничего не найдено. Попробуй другое слово, например: <b>text</b>, <b>pack</b>, <b>bundle</b>, <b>joshh</b>.</div>
+  </section>
+
+  <section class="section fade">
+    <h2>Информация о сайте</h2>
+    <p class="section-note">AE editor presets сделан как удобная библиотека для тех, кто работает в After Effects и хочет быстро находить нужные пресеты без лишних переходов.</p>
+    <div class="info-grid">
+      <div class="info-card"><h3>Что здесь собрано</h3><p>Готовые паки пресетов, которые можно скачать в один клик и сразу использовать в монтаже.</p></div>
+      <div class="info-card"><h3>Для кого сайт</h3><p>Для эдиторов, монтажёров и тех, кто хочет ускорить работу в After Effects.</p></div>
+      <div class="info-card"><h3>Обновления</h3><p>Новые паки будут добавляться со временем, чтобы библиотека оставалась полезной и актуальной.</p></div>
+    </div>
+  </section>
+
+  <section class="section glass fade">
+    <h2>Инструкция по установке</h2>
+    <p class="section-note">Установка пака пресетов (.ffx файлов) в After Effects выполняется путём копирования файлов в папку <b>User Presets</b> по пути: <b>Документы\Adobe\After Effects [версия]\User Presets</b>.</p>
+    <ol class="install-list">
+      <li>Скачайте нужный пак кнопкой <b>Скачать</b> под названием пака.</li>
+      <li>Если архив скачался в формате .zip или .rar, распакуйте его в удобную папку.</li>
+      <li>Найдите внутри файлы формата <b>.ffx</b> — это сами пресеты.</li>
+      <li>Скопируйте .ffx файлы в папку <b>Документы\Adobe\After Effects [версия]\User Presets</b>.</li>
+      <li>Запустите или перезапустите After Effects.</li>
+      <li>Откройте панель <b>Effects &amp; Presets</b> и найдите нужные пресеты через поиск или список.</li>
+    </ol>
+    <p class="install-note">Все файлы на сайте отмечены как бесплатные. Новые паки будут добавляться со временем.</p>
+  </section>
+
+  <section class="section glass fade">
+    <h2>Подписка на Telegram</h2>
+    <p class="section-note">Подпишись на наш Telegram канал, чтобы не пропустить новые обновления, свежие паки и будущие добавления на сайт.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <a class="btn" href="https://t.me/+zDk9Y2d1Cik2MmVi">Подписаться</a>
+    </div>
+  </section>
+
+  <div class="footer fade">by hejon © 2026</div>
+</main>
+
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAkoOXzdvlGNT8b1dJbGmGDEnaEWlpDFdU",
+    authDomain: "ae-presets.firebaseapp.com",
+    databaseURL: "https://ae-presets-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "ae-presets",
+    storageBucket: "ae-presets.firebasestorage.app",
+    messagingSenderId: "701819786593",
+    appId: "1:701819786593:web:f2c0b4c6cdf3bb685be120"
+  };
+
+  let db = null;
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+  } catch (err) {
+    console.error('Firebase init failed:', err);
+  }
+
+  const updateCounts = (rootPath, selector) => {
+    if (!db) return;
+    onValue(ref(db, rootPath), (snap) => {
+      const data = snap.val() || {};
+      document.querySelectorAll(selector).forEach(el => {
+        const card = el.closest('[data-key]');
+        const key = card?.dataset.key;
+        const value = key && Object.prototype.hasOwnProperty.call(data, key) ? data[key] : 0;
+        el.textContent = value;
+      });
+      window.syncRecommendations?.();
+    }, (err) => console.error(`Firebase ${rootPath} listener error:`, err));
+  };
+
+  updateCounts('downloads', '.dl-counter-num');
+  updateCounts('likes', '.like-count');
+
+  window.firebaseActions = {
+    incrementDownload: async (key) => {
+      if (!db) return;
+      await runTransaction(ref(db, `downloads/${key}`), (current) => (current || 0) + 1);
+    },
+    incrementLike: async (key) => {
+      if (!db) return;
+      await runTransaction(ref(db, `likes/${key}`), (current) => (current || 0) + 1);
+    },
+    decrementLike: async (key) => {
+      if (!db) return;
+      await runTransaction(ref(db, `likes/${key}`), (current) => Math.max((current || 0) - 1, 0));
+    }
+  };
+</script>
+
+<script>
+  const FAV_KEY  = 'ae_editor_favorites_v1';
+  const LIKE_KEY = 'ae_editor_liked_v1';
+
+  const PACK_SIZES = {
+    'trxzy-editing-pack': '79 МБ',
+    'seb-aep-pack': '170 КБ',
+    'ezo-editing-bundle': '13 КБ',
+    'envyy-editing-pack': '493 МБ',
+    'legan-editing-bundle': '2,6 МБ',
+    'drxpz-editing-presets': '6,3 МБ',
+    'final-cut-editing-pack': '461 МБ',
+    'text-animations-pack': '97 КБ',
+    'ctoan-ultimate-pack': '600 МБ',
+    'joshh-editing-pack-v3': '180 МБ'
+  };
+
+  const dlIncrement = async (key) => { const api = window.firebaseActions; if (api?.incrementDownload) await api.incrementDownload(key); };
+  const likeIncrement = async (key) => { const api = window.firebaseActions; if (api?.incrementLike) await api.incrementLike(key); };
+  const likeDecrement = async (key) => { const api = window.firebaseActions; if (api?.decrementLike) await api.decrementLike(key); };
+
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement.scrollTop;
+    const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    document.getElementById('progress').style.width = (h > 0 ? (s/h)*100 : 0) + '%';
+  }, { passive: true });
+
+  // Fade observer
+  const fadeObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade').forEach(el => fadeObs.observe(el));
+
+  // Card glow
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+
+  function applyPackSizes() {
+    cards.forEach(card => {
+      const key = getKey(card);
+      const size = card.dataset.size || PACK_SIZES[key];
+      if (!size) return;
+      card.dataset.size = size;
+      const free = card.querySelector('.free');
+      if (free && !card.querySelector('.pack-size')) {
+        const badge = document.createElement('div');
+        badge.className = 'pack-size';
+        badge.textContent = size;
+        free.insertAdjacentElement('afterend', badge);
+      }
+    });
+  }
+
+  // Search
+  const input = document.getElementById('searchInput');
+  const cards = Array.from(document.querySelectorAll('#cards .card'));
+  const recGrid = document.getElementById('recommendationsGrid');
+  const emptyRec = document.getElementById('emptyRecommendations');
+  const searchSection = document.getElementById('searchResultsSection');
+  const searchGrid = document.getElementById('searchResultsGrid');
+  const emptySearch = document.getElementById('emptySearchResults');
+  const searchHint = document.getElementById('searchHint');
+  document.getElementById('totalPacksChip').textContent = cards.length;
+
+  function resetSearchHint() {
+    searchHint.innerHTML = `Всего паков: <span class="count">${cards.length}</span>`;
+  }
+
+  function renderSearchResults() {
+    const val = input.value.trim().toLowerCase();
+    if (!val) {
+      searchSection.style.display = 'none';
+      searchGrid.innerHTML = '';
+      emptySearch.style.display = 'none';
+      resetSearchHint();
+      document.getElementById('resultCount').textContent = 0;
+      return;
+    }
+
+    const ranked = cards
+      .filter(c => (c.dataset.name || '').includes(val))
+      .sort((a, b) => a.dataset.name.localeCompare(b.dataset.name, 'ru'));
+
+    searchSection.style.display = 'block';
+    searchGrid.innerHTML = '';
+    document.getElementById('resultCount').textContent = ranked.length;
+    searchHint.textContent = `Показаны результаты для "${input.value.trim()}"`;
+    emptySearch.style.display = ranked.length ? 'none' : 'block';
+
+    ranked.forEach(card => {
+      const key = getKey(card);
+      const clone = card.cloneNode(true);
+      clone.classList.remove('fade');
+      clone.classList.add('show');
+      const title = clone.querySelector('.title')?.textContent || '';
+
+      clone.querySelector('.dl-btn')?.addEventListener('click', () => dlIncrement(key));
+      clone.querySelector('.about-btn')?.addEventListener('click', () => openModal(card));
+      clone.querySelector('.fav-btn')?.addEventListener('click', e => { e.stopPropagation(); toggleFav(key, card); });
+      clone.querySelector('.like-btn')?.addEventListener('click', e => { e.stopPropagation(); toggleLike(key); });
+      setFavUI(clone, favorites.includes(key));
+      setLikeUI(clone, liked.includes(key));
+      searchGrid.appendChild(clone);
+    });
+  }
+  input.addEventListener('input', renderSearchResults);
+  resetSearchHint();
+
+  function numValue(card, selector) {
+    const el = card.querySelector(selector);
+    const parsed = Number((el?.textContent || '0').toString().replace(/[^\d.]/g, ''));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function recScore(card) {
+    const likes = numValue(card, '.like-count');
+    const downloads = numValue(card, '.dl-counter-num');
+    return (likes * 1.5) + (Math.sqrt(downloads + 1) * 2);
+  }
+
+  function syncRecommendations() {
+    if (!recGrid) return;
+    const ranked = [...cards]
+      .sort((a, b) => recScore(b) - recScore(a))
+      .slice(0, 4);
+
+    recGrid.innerHTML = '';
+    emptyRec.style.display = ranked.length ? 'none' : 'block';
+
+    ranked.forEach(card => {
+      const key = getKey(card);
+      const title = card.querySelector('.title')?.textContent || '';
+      const image = card.dataset.image || '';
+      const size = card.dataset.size || PACK_SIZES[key] || '';
+
+      const item = document.createElement('article');
+      item.className = 'recommendation-card';
+      item.dataset.key = key;
+      item.innerHTML = `
+        <img class="recommendation-thumb" src="${image}" alt="${title}" loading="lazy" />
+        <div class="card-head">
+          <h3 class="title">${title}</h3>
+          <button class="fav-btn" type="button" aria-label="Добавить в избранное"><span>☆</span></button>
+        </div>
+        ${size ? `<div class="recommendation-size">${size}</div>` : ''}
+        <div class="card-stats">
+          <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">${sourceCount(key, '.dl-counter-num')}</span>&nbsp;скачиваний</div>
+          <button class="like-btn" type="button" aria-pressed="false" aria-label="Поставить лайк"><span class="like-icon">♥</span><span class="like-count">${sourceCount(key, '.like-count')}</span></button>
+        </div>
+        <div class="recommendation-actions">
+          <a class="btn dl-btn" href="${card.dataset.download}" target="_blank" rel="noopener">Скачать</a>
+          <button class="about-btn" type="button">О паке</button>
+        </div>
+      `;
+
+      item.querySelector('.dl-btn')?.addEventListener('click', () => dlIncrement(key));
+      item.querySelector('.about-btn')?.addEventListener('click', () => openModal(card));
+      item.querySelector('.fav-btn')?.addEventListener('click', e => { e.stopPropagation(); toggleFav(key, card); });
+      const itemLikeBtn = item.querySelector('.like-btn');
+      if (itemLikeBtn) {
+        itemLikeBtn.addEventListener('click', e => { e.stopPropagation(); toggleLike(key); });
+      }
+
+      setFavUI(item, favorites.includes(key));
+      setLikeUI(item, liked.includes(key));
+      recGrid.appendChild(item);
+    });
+  }
+
+  window.syncRecommendations = syncRecommendations;
+
+  document.getElementById('clearBtn').addEventListener('click', () => { input.value=''; renderSearchResults(); input.focus(); });
+
+  // Favorites
+  const favGrid = document.getElementById('favoritesGrid');
+  const emptyFavs = document.getElementById('emptyFavorites');
+  const favCountEl = document.getElementById('favCount');
+  const getKey = c => c.dataset.key;
+  const sourceCardByKey = (key) => cards.find(c => getKey(c) === key);
+  const sourceCount = (key, selector) => {
+    const card = sourceCardByKey(key);
+    return card ? (card.querySelector(selector)?.textContent || '0') : '0';
+  };
+
+  function loadFavs() { try { const p = JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); return Array.isArray(p) ? p : []; } catch { return []; } }
+  function saveFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
+  let favorites = loadFavs();
+
+  function setFavUI(card, isFav) {
+    const btn = card.querySelector('.fav-btn');
+    if (!btn) return;
+    btn.classList.toggle('is-favorite', isFav);
+    const star = btn.querySelector('span');
+    if (star) star.textContent = isFav ? '★' : '☆';
+    card.classList.toggle('is-favorite', isFav);
+  }
+
+  function renderFavs() {
+    favGrid.innerHTML = '';
+    const favCards = cards.filter(c => favorites.includes(getKey(c)));
+    favCountEl.textContent = String(favCards.length);
+    emptyFavs.style.display = favCards.length ? 'none' : 'block';
+
+    favCards.forEach(card => {
+      const key = getKey(card);
+      const clone = document.createElement('article');
+      clone.className = 'card favorite-card';
+      clone.dataset.key = key;
+      clone.innerHTML = `
+        <img class="favorite-thumb" src="${card.dataset.image || ''}" alt="${card.querySelector('.title')?.textContent || ''}" loading="lazy" />
+        <h3 class="title">${card.querySelector('.title').textContent}</h3>
+        <div class="free">Бесплатный пак</div>
+        ${(() => { const s = card.dataset.size || PACK_SIZES[key] || ''; return s ? `<div class="pack-size">${s}</div>` : ''; })()}
+        <div class="dl-counter"><span class="dl-counter-icon">↓</span><span class="dl-counter-num">${sourceCount(key, '.dl-counter-num')}</span>&nbsp;скачиваний</div>
+        <div class="favorite-actions">
+          <a class="btn dl-btn" href="${card.dataset.download}" target="_blank" rel="noopener">Скачать</a>
+          <button class="remove-fav" type="button">Убрать</button>
+        </div>`;
+      clone.querySelector('.dl-btn').addEventListener('click', () => dlIncrement(key));
+      clone.querySelector('.remove-fav').addEventListener('click', () => toggleFav(getKey(card), card, true));
+      favGrid.appendChild(clone);
+    });
+  }
+
+  function toggleFav(key, card, forceRemove = false) {
+    const was = favorites.includes(key);
+    const now = forceRemove ? false : !was;
+    favorites = now ? Array.from(new Set([...favorites, key])) : favorites.filter(k => k !== key);
+    saveFavs(favorites);
+    setFavUI(card, now);
+    card.classList.remove('fav-pulse'); void card.offsetWidth; card.classList.add('fav-pulse');
+    setTimeout(() => card.classList.remove('fav-pulse'), 520);
+    cards.forEach(c => setFavUI(c, favorites.includes(getKey(c))));
+    renderFavs();
+    syncRecommendations();
+    renderSearchResults();
+  }
+
+  // Likes
+  function loadLiked() { try { const p = JSON.parse(localStorage.getItem(LIKE_KEY) || '[]'); return Array.isArray(p) ? p : []; } catch { return []; } }
+  function saveLiked(arr) { localStorage.setItem(LIKE_KEY, JSON.stringify(arr)); }
+  let liked = loadLiked();
+
+  const cssEscape = (value) => (window.CSS && typeof CSS.escape === 'function')
+    ? CSS.escape(value)
+    : String(value).replace(/["\\]/g, '\\$&');
+
+  function setLikeUI(card, isLiked) {
+    const btn = card.querySelector('.like-btn');
+    if (!btn) return;
+    btn.classList.toggle('liked', isLiked);
+    btn.setAttribute('aria-pressed', String(!!isLiked));
+  }
+
+  function syncLikeButtons(key) {
+    const likedNow = liked.includes(key);
+    document.querySelectorAll(`[data-key="${cssEscape(key)}"] .like-btn`).forEach(btn => {
+      btn.classList.toggle('liked', likedNow);
+      btn.setAttribute('aria-pressed', String(likedNow));
+    });
+  }
+
+  async function toggleLike(key) {
+    const wasLiked = liked.includes(key);
+    liked = wasLiked ? liked.filter(k => k !== key) : Array.from(new Set([...liked, key]));
+    saveLiked(liked);
+
+    syncLikeButtons(key);
+    document.querySelectorAll(`[data-key="${cssEscape(key)}"] .like-btn`).forEach(btn => {
+      btn.classList.add('like-bump');
+      setTimeout(() => btn.classList.remove('like-bump'), 420);
+    });
+
+    if (wasLiked) await likeDecrement(key);
+    else await likeIncrement(key);
+    renderSearchResults();
+  }
+
+  // Modal
+  const overlay  = document.getElementById('modalOverlay');
+  const mClose   = document.getElementById('modalClose');
+  const mBanner  = document.getElementById('modalBanner');
+  const mTitle   = document.getElementById('modalTitle');
+  const mAeReq   = document.getElementById('modalAeReq');
+  const mSize    = document.getElementById('modalSize');
+  const mTags    = document.getElementById('modalTags');
+  const mDesc    = document.getElementById('modalDesc');
+  const mDescLbl = document.getElementById('modalDescLabel');
+  const mDlBtn   = document.getElementById('modalDlBtn');
+
+  function openModal(card) {
+    const ae = card.dataset.ae || 'After Effects';
+    const items = (card.dataset.items || '').split(',').map(s => s.trim()).filter(Boolean);
+    const desc = card.dataset.desc || '';
+    const image = card.dataset.image || '';
+
+    if (image) {
+      mBanner.src = image;
+      mBanner.alt = card.querySelector('.title')?.textContent || '';
+      mBanner.style.display = 'block';
+    } else {
+      mBanner.style.display = 'none';
+      mBanner.removeAttribute('src');
+    }
+
+    mTitle.textContent = card.querySelector('.title').textContent;
+    mAeReq.textContent = '⚡ ' + ae;
+    const modalSize = card.dataset.size || PACK_SIZES[card.dataset.key] || '';
+    mSize.textContent = modalSize;
+    mSize.style.display = modalSize ? '' : 'none';
+    mTags.innerHTML = items.map(i => `<span class="modal-tag">${i}</span>`).join('');
+    if (desc) { mDesc.textContent = desc; mDescLbl.style.display = ''; }
+    else { mDesc.textContent = ''; mDescLbl.style.display = 'none'; }
+    mDlBtn.href = card.dataset.download || '#';
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.classList.remove('open');
+      overlay.style.opacity='';
+      document.body.style.overflow='';
+      mBanner.removeAttribute('src');
+      mBanner.alt = '';
+    }, 240);
+  }
+
+  mClose.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Wire up all cards
+  cards.forEach(card => {
+    const key = getKey(card);
+
+    const favBtn = card.querySelector('.fav-btn');
+    if (favBtn) favBtn.addEventListener('click', e => { e.stopPropagation(); toggleFav(key, card); });
+
+    const dlBtn = card.querySelector('.dl-btn');
+    if (dlBtn) dlBtn.addEventListener('click', () => dlIncrement(key));
+
+    const likeBtn = card.querySelector('.like-btn');
+    if (likeBtn) {
+      syncLikeButtons(key);
+      likeBtn.addEventListener('click', e => { e.stopPropagation(); toggleLike(key); });
+    }
+
+    const aboutBtn = card.querySelector('.about-btn');
+    if (aboutBtn) aboutBtn.addEventListener('click', () => openModal(card));
+  });
+
+  applyPackSizes();
+  cards.forEach(c => {
+    setFavUI(c, favorites.includes(getKey(c)));
+    setLikeUI(c, liked.includes(getKey(c)));
+  });
+  renderFavs();
+  renderSearchResults();
+  syncRecommendations();
+</script>
+
+</body>
+</html>
